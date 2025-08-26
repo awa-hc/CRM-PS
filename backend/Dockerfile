@@ -1,50 +1,24 @@
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24.4 AS builder
 
-# Install git and ca-certificates (needed for go mod download)
-RUN apk add --no-cache git ca-certificates
-
-# Set working directory
 WORKDIR /app
 
 # Copy go mod files
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
 
-# Copy source code
+# Copy source code and build
 COPY . .
-
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/main.go
-
-# Create migration binary (if needed)
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o migrate cmd/migrate.go 2>/dev/null || echo "No migrate.go found"
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/main.go
 
 # Final stage
 FROM alpine:latest
 
-# Install ca-certificates for HTTPS requests
 RUN apk --no-cache add ca-certificates
-
-# Create app directory
 WORKDIR /app
 
-# Copy binary from builder stage
+# Copy binary
 COPY --from=builder /app/main .
-COPY --from=builder /app/migrate . 2>/dev/null || true
 
-# Copy any static files if they exist
-COPY --from=builder /app/static ./static 2>/dev/null || true
-COPY --from=builder /app/templates ./templates 2>/dev/null || true
-
-# Expose port
 EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
-
-# Run the application
 CMD ["./main"]
