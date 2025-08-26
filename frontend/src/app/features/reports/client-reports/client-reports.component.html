@@ -1,0 +1,346 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <mat-icon>people</mat-icon>
+      Reportes de Clientes
+    </h1>
+    <div class="header-actions">
+      <button mat-raised-button [matMenuTriggerFor]="exportMenu" [disabled]="loading || !report">
+        <mat-icon>download</mat-icon>
+        Exportar
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportReport('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Exportar PDF
+        </button>
+        <button mat-menu-item (click)="exportReport('excel')">
+          <mat-icon>table_chart</mat-icon>
+          Exportar Excel
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>filter_list</mat-icon>
+        Filtros
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filtersForm" class="filters-form">
+        <div class="filters-row">
+          <mat-form-field>
+            <mat-label>Fecha Inicio</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Fecha Fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Cliente Específico</mat-label>
+            <mat-select formControlName="clientId">
+              <mat-option value="">Todos los clientes</mat-option>
+              <mat-option *ngFor="let client of clients" [value]="client.id">
+                {{ client.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Tipo de Cliente</mat-label>
+            <mat-select formControlName="clientType">
+              <mat-option value="">Todos los tipos</mat-option>
+              <mat-option value="individual">Individual</mat-option>
+              <mat-option value="company">Empresa</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filters-actions">
+          <button mat-raised-button color="primary" (click)="applyFilters()" [disabled]="loading">
+            <mat-icon>search</mat-icon>
+            Aplicar Filtros
+          </button>
+          <button mat-button (click)="clearFilters()" [disabled]="loading">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Generando reporte de clientes...</p>
+  </div>
+
+  <!-- Report Content -->
+  <div *ngIf="!loading && report" class="report-content">
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <mat-card class="summary-card total">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>people</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ report.totalClients }}</h3>
+              <p>Total Clientes</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card active">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ report.activeClients }}</h3>
+              <p>Clientes Activos</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card revenue">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>euro_symbol</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ formatCurrency(report.totalRevenue) }}</h3>
+              <p>Ingresos Totales</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card average">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>account_balance_wallet</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ formatCurrency(report.averageProjectValue) }}</h3>
+              <p>Valor Promedio por Proyecto</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Client Performance Table -->
+    <mat-card class="performance-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>assessment</mat-icon>
+          Rendimiento por Cliente
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="report.clientPerformance" class="performance-table">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Cliente</th>
+              <td mat-cell *matCellDef="let client">{{ client.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="projectCount">
+              <th mat-header-cell *matHeaderCellDef>Proyectos</th>
+              <td mat-cell *matCellDef="let client">{{ client.projectCount }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="totalValue">
+              <th mat-header-cell *matHeaderCellDef>Valor Total</th>
+              <td mat-cell *matCellDef="let client">{{ formatCurrency(client.totalValue) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="averageProjectValue">
+              <th mat-header-cell *matHeaderCellDef>Valor Promedio</th>
+              <td mat-cell *matCellDef="let client">{{ formatCurrency(client.averageProjectValue) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="completedProjects">
+              <th mat-header-cell *matHeaderCellDef>Completados</th>
+              <td mat-cell *matCellDef="let client">{{ client.completedProjects }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="completionRate">
+              <th mat-header-cell *matHeaderCellDef>Tasa Finalización</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="completion-rate">
+                  <span>{{ client.completionRate.toFixed(1) }}%</span>
+                  <mat-progress-bar 
+                    mode="determinate" 
+                    [value]="client.completionRate"
+                    [color]="getCompletionColor(client.completionRate)">
+                  </mat-progress-bar>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastProject">
+              <th mat-header-cell *matHeaderCellDef>Último Proyecto</th>
+              <td mat-cell *matCellDef="let client">{{ formatDate(client.lastProjectDate) }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="performanceColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: performanceColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Client Types Distribution -->
+    <mat-card class="types-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>donut_large</mat-icon>
+          Distribución por Tipo de Cliente
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="types-grid">
+          <div *ngFor="let type of report.clientsByType" class="type-item">
+            <div class="type-info">
+              <mat-chip [class]="getTypeClass(type.type)">{{ getTypeLabel(type.type) }}</mat-chip>
+              <span class="type-count">{{ type.count }} clientes</span>
+            </div>
+            <div class="type-bar">
+              <mat-progress-bar 
+                mode="determinate" 
+                [value]="getTypePercentage(type.count)"
+                color="primary">
+              </mat-progress-bar>
+            </div>
+            <div class="type-revenue">
+              <span>{{ formatCurrency(type.totalRevenue) }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Top Clients -->
+    <mat-card class="top-clients-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>star</mat-icon>
+          Principales Clientes
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="top-clients-list">
+          <div *ngFor="let client of report.topClients; let i = index" class="top-client-item">
+            <div class="client-rank">
+              <span class="rank-number">{{ i + 1 }}</span>
+            </div>
+            <div class="client-details">
+              <h4>{{ client.clientName }}</h4>
+              <p>{{ client.projectsCount }} proyectos</p>
+              <small>Cliente Principal</small>
+            </div>
+            <div class="client-metrics">
+              <div class="metric">
+                <span class="metric-value">{{ formatCurrency(client.totalRevenue) }}</span>
+                <span class="metric-label">Valor Total</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value">{{ (client.projectsCount > 0 ? 100 : 0).toFixed(1) }}%</span>
+                <span class="metric-label">Finalización</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Activity -->
+    <mat-card class="activity-card" *ngIf="report.recentActivity.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Actividad Reciente
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="activity-list">
+          <div *ngFor="let activity of report.recentActivity" class="activity-item">
+            <div class="activity-icon">
+              <mat-icon [class]="getActivityClass(activity.type)">{{ getActivityIcon(activity.type) }}</mat-icon>
+            </div>
+            <div class="activity-info">
+              <h4>{{ activity.clientName }}</h4>
+              <p>{{ activity.description }}</p>
+              <small>{{ formatDate(activity.date) }}</small>
+            </div>
+            <div class="activity-value">
+              <span class="activity-type">{{ activity.type }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Geographic Distribution -->
+    <mat-card class="geographic-card" *ngIf="report.geographicDistribution.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>location_on</mat-icon>
+          Distribución Geográfica
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="geographic-list">
+          <div *ngFor="let location of report.geographicDistribution" class="location-item">
+            <div class="location-info">
+              <span class="location-name">{{ location.location }}</span>
+              <span class="location-count">{{ location.count }} clientes</span>
+            </div>
+            <div class="location-bar">
+              <mat-progress-bar 
+                mode="determinate" 
+                [value]="location.percentage"
+                color="accent">
+              </mat-progress-bar>
+            </div>
+            <div class="location-percentage">
+              <span>{{ location.percentage.toFixed(1) }}%</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- No Data -->
+  <mat-card *ngIf="!loading && !report" class="no-data-card">
+    <mat-card-content>
+      <div class="no-data">
+        <mat-icon>people</mat-icon>
+        <h3>No hay datos disponibles</h3>
+        <p>Ajusta los filtros para generar el reporte de clientes</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

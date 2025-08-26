@@ -1,0 +1,160 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+        {{ isEditMode ? 'Editar Cliente' : 'Nuevo Cliente' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+        <!-- Información Básica -->
+        <div class="section">
+          <h3>Información Básica</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Cliente</mat-label>
+              <mat-select formControlName="contactType" (selectionChange)="onTypeChange()">
+                <mat-option value="individual">Persona Física</mat-option>
+                <mat-option value="company">Empresa</mat-option>
+              </mat-select>
+              <mat-error *ngIf="clientForm.get('contactType')?.hasError('required')">
+                El tipo de cliente es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row" *ngIf="clientForm.get('contactType')?.value === 'individual'">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input matInput formControlName="firstName" placeholder="Ingrese el nombre">
+              <mat-error *ngIf="clientForm.get('firstName')?.hasError('required')">
+                El nombre es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido</mat-label>
+              <input matInput formControlName="lastName" placeholder="Ingrese el apellido">
+              <mat-error *ngIf="clientForm.get('lastName')?.hasError('required')">
+                El apellido es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row" *ngIf="clientForm.get('contactType')?.value === 'company'">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre de la Empresa</mat-label>
+              <input matInput formControlName="companyName" placeholder="Ingrese el nombre de la empresa">
+              <mat-error *ngIf="clientForm.get('companyName')?.hasError('required')">
+                El nombre de la empresa es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Información de Contacto -->
+        <div class="section">
+          <h3>Información de Contacto</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="correo@ejemplo.com">
+              <mat-icon matSuffix>email</mat-icon>
+              <mat-error *ngIf="clientForm.get('email')?.hasError('required')">
+                El email es requerido
+              </mat-error>
+              <mat-error *ngIf="clientForm.get('email')?.hasError('email')">
+                Ingrese un email válido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input matInput formControlName="phone" placeholder="+1234567890">
+              <mat-icon matSuffix>phone</mat-icon>
+              <mat-error *ngIf="clientForm.get('phone')?.hasError('required')">
+                El teléfono es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+
+        </div>
+
+        <!-- Dirección -->
+        <div class="section">
+          <h3>Dirección</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Dirección</mat-label>
+              <input matInput formControlName="address" placeholder="Calle, número, colonia">
+              <mat-icon matSuffix>location_on</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Ciudad</mat-label>
+              <input matInput formControlName="city" placeholder="Ciudad">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Estado/Provincia</mat-label>
+              <input matInput formControlName="state" placeholder="Estado">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Código Postal</mat-label>
+              <input matInput formControlName="zipCode" placeholder="12345">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div class="section">
+          <h3>Información Adicional</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Notas</mat-label>
+              <textarea matInput formControlName="notes" rows="4" placeholder="Notas adicionales sobre el cliente"></textarea>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row" *ngIf="clientForm.get('contactType')?.value === 'company'">
+            <mat-form-field appearance="outline">
+              <mat-label>RFC/Tax ID</mat-label>
+              <input matInput formControlName="taxId" placeholder="RFC o Tax ID">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Empresa</mat-label>
+              <input matInput formControlName="company" placeholder="Nombre de la empresa">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="actions">
+          <button type="button" mat-button (click)="onCancel()">
+            <mat-icon>cancel</mat-icon>
+            Cancelar
+          </button>
+          
+          <button type="submit" mat-raised-button color="primary" [disabled]="clientForm.invalid || loading">
+            <mat-icon *ngIf="!loading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+            {{ isEditMode ? 'Actualizar' : 'Crear' }} Cliente
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

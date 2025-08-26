@@ -1,0 +1,200 @@
+<div class="quotes-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Cotizaciones</h1>
+    <button mat-raised-button color="primary" routerLink="/quotes/new">
+      <mat-icon>add</mat-icon>
+      Nueva Cotización
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <div class="filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Buscar</mat-label>
+        <input matInput [(ngModel)]="filters.search" (ngModelChange)="onFilterChange()" 
+               placeholder="Buscar por número, título o cliente...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cliente</mat-label>
+        <mat-select [(ngModel)]="filters.clientId" (ngModelChange)="onFilterChange()">
+          <mat-option value="">Todos los clientes</mat-option>
+          <mat-option *ngFor="let client of clients" [value]="client.id">
+            {{client.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Proyecto</mat-label>
+        <mat-select [(ngModel)]="filters.projectId" (ngModelChange)="onFilterChange()">
+          <mat-option value="">Todos los proyectos</mat-option>
+          <mat-option *ngFor="let project of projects" [value]="project.id">
+            {{project.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select [(ngModel)]="filters.status" (ngModelChange)="onFilterChange()">
+          <mat-option value="">Todos los estados</mat-option>
+          <mat-option value="draft">Borrador</mat-option>
+          <mat-option value="sent">Enviada</mat-option>
+          <mat-option value="accepted">Aceptada</mat-option>
+          <mat-option value="rejected">Rechazada</mat-option>
+          <mat-option value="expired">Expirada</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        Limpiar
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Table -->
+  <mat-card *ngIf="!loading" class="table-card">
+    <table mat-table [dataSource]="quotes" class="quotes-table">
+      <!-- Quote Number Column -->
+      <ng-container matColumnDef="quoteNumber">
+        <th mat-header-cell *matHeaderCellDef>Número</th>
+        <td mat-cell *matCellDef="let quote">
+          <a [routerLink]="['/quotes', quote.id]" class="quote-link">
+            {{quote.quoteNumber}}
+          </a>
+        </td>
+      </ng-container>
+
+      <!-- Title Column -->
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Título</th>
+        <td mat-cell *matCellDef="let quote">
+          <div class="title-cell">
+            <span class="title">{{quote.title}}</span>
+            <span class="description" *ngIf="quote.description">{{quote.description}}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Client Column -->
+      <ng-container matColumnDef="client">
+        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+        <td mat-cell *matCellDef="let quote">
+          <a [routerLink]="['/clients', quote.clientId]" class="client-link">
+            {{quote.client?.name}}
+          </a>
+        </td>
+      </ng-container>
+
+      <!-- Project Column -->
+      <ng-container matColumnDef="project">
+        <th mat-header-cell *matHeaderCellDef>Proyecto</th>
+        <td mat-cell *matCellDef="let quote">
+          <a *ngIf="quote.project" [routerLink]="['/app/projects', quote.projectId]" class="project-link">
+            {{quote.project.name}}
+          </a>
+          <span *ngIf="!quote.project" class="no-project">Sin proyecto</span>
+        </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let quote">
+          <mat-chip [class]="'status-' + quote.status">
+            {{getStatusLabel(quote.status)}}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <!-- Total Column -->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef>Total</th>
+        <td mat-cell *matCellDef="let quote">
+          <span class="total-amount">
+            {{quote.total | currency:'USD':'symbol':'1.2-2'}}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Valid Until Column -->
+      <ng-container matColumnDef="validUntil">
+        <th mat-header-cell *matHeaderCellDef>Válida hasta</th>
+        <td mat-cell *matCellDef="let quote">
+          <span *ngIf="quote.validUntil" [class.expired]="isExpired(quote.validUntil)">
+            {{formatDate(quote.validUntil)}}
+          </span>
+          <span *ngIf="!quote.validUntil" class="no-expiry">Sin vencimiento</span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let quote">
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item [routerLink]="['/quotes', quote.id]">
+              <mat-icon>visibility</mat-icon>
+              Ver
+            </button>
+            <button mat-menu-item [routerLink]="['/quotes', quote.id, 'edit']">
+              <mat-icon>edit</mat-icon>
+              Editar
+            </button>
+            <button mat-menu-item (click)="sendQuote(quote)" 
+                    [disabled]="quote.status !== 'draft'">
+              <mat-icon>send</mat-icon>
+              Enviar
+            </button>
+            <button mat-menu-item (click)="duplicateQuote(quote)">
+              <mat-icon>content_copy</mat-icon>
+              Duplicar
+            </button>
+            <button mat-menu-item (click)="downloadPDF(quote)">
+              <mat-icon>download</mat-icon>
+              Descargar PDF
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="deleteQuote(quote)" class="delete-action">
+              <mat-icon>delete</mat-icon>
+              Eliminar
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- No data -->
+    <div *ngIf="quotes.length === 0" class="no-data">
+      <mat-icon>description</mat-icon>
+      <p>No se encontraron cotizaciones</p>
+    </div>
+  </mat-card>
+
+  <!-- Pagination -->
+  <mat-paginator
+    *ngIf="!loading && totalQuotes > 0"
+    [length]="totalQuotes"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 25, 50, 100]"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>

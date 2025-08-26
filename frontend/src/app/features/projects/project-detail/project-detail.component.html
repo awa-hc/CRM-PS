@@ -1,0 +1,244 @@
+<div class="detail-container">
+  <!-- Header -->
+  <div class="header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ project?.name || 'Cargando...' }}</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="editProject()" [disabled]="!project">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando proyecto...</p>
+  </div>
+
+  <!-- Project Details -->
+  <div *ngIf="!loading && project" class="content">
+    <mat-tab-group>
+      <!-- General Information -->
+      <mat-tab label="Información General">
+        <div class="tab-content">
+          <div class="info-grid">
+            <!-- Basic Info Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>info</mat-icon>
+                  Información Básica
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="info-row">
+                  <span class="label">Código:</span>
+                  <span class="value">{{ project.code }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Cliente:</span>
+                  <span class="value">{{ client?.name || 'Cargando...' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Estado:</span>
+                  <mat-chip [class]="'status-' + project.status">{{ getStatusLabel(project.status) }}</mat-chip>
+                </div>
+                <div class="info-row">
+                  <span class="label">Prioridad:</span>
+                  <mat-chip [class]="'priority-' + project.priority">{{ getPriorityLabel(project.priority) }}</mat-chip>
+                </div>
+                <div class="info-row">
+                  <span class="label">Tipo:</span>
+                  <span class="value">{{ getTypeLabel(project.type) }}</span>
+                </div>
+                <div class="info-row" *ngIf="project.description">
+                  <span class="label">Descripción:</span>
+                  <span class="value">{{ project.description }}</span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Progress Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>trending_up</mat-icon>
+                  Progreso
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="progress-info">
+                  <div class="progress-header">
+                    <span class="progress-label">{{ project.progress }}% Completado</span>
+                  </div>
+                  <mat-progress-bar mode="determinate" [value]="project.progress" class="progress-bar"></mat-progress-bar>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Location Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>location_on</mat-icon>
+                  Ubicación
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="info-row">
+                  <span class="label">Dirección:</span>
+                  <span class="value">{{ project.address }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Ciudad:</span>
+                  <span class="value">{{ project.city }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Estado:</span>
+                  <span class="value">{{ project.state }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Código Postal:</span>
+                  <span class="value">{{ project.zipCode }}</span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Dates Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>schedule</mat-icon>
+                  Fechas
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="info-row" *ngIf="project.startDate">
+                  <span class="label">Fecha de Inicio:</span>
+                  <span class="value">{{ formatDate(project.startDate) }}</span>
+                </div>
+                <div class="info-row" *ngIf="project.endDate">
+                  <span class="label">Fecha de Fin:</span>
+                  <span class="value">{{ formatDate(project.endDate) }}</span>
+                </div>
+                <div class="info-row" *ngIf="project.estimatedEndDate">
+                  <span class="label">Fecha Estimada de Fin:</span>
+                  <span class="value">{{ formatDate(project.estimatedEndDate) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Creado:</span>
+                  <span class="value">{{ formatDate(project.createdAt) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Actualizado:</span>
+                  <span class="value">{{ formatDate(project.updatedAt) }}</span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Financial Information -->
+      <mat-tab label="Información Financiera">
+        <div class="tab-content">
+          <div class="financial-grid">
+            <mat-card class="financial-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>attach_money</mat-icon>
+                  Presupuesto
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="financial-amount budget">
+                  {{ formatCurrency(project.budget) }}
+                </div>
+                <div class="financial-label">Presupuesto Total</div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="financial-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>calculate</mat-icon>
+                  Costo Estimado
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="financial-amount estimated">
+                  {{ formatCurrency(project.estimatedCost) }}
+                </div>
+                <div class="financial-label">Costo Estimado</div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="financial-card" *ngIf="project.actualCost">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>receipt</mat-icon>
+                  Costo Real
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="financial-amount actual">
+                  {{ formatCurrency(project.actualCost) }}
+                </div>
+                <div class="financial-label">Costo Real</div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="financial-card variance" *ngIf="project.actualCost">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>trending_{{ getVarianceIcon() }}</mat-icon>
+                  Variación
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="financial-amount" [class]="getVarianceClass()">
+                  {{ getVarianceText() }}
+                </div>
+                <div class="financial-label">vs. Presupuesto</div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Notes -->
+      <mat-tab label="Notas" *ngIf="project.notes">
+        <div class="tab-content">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>note</mat-icon>
+                Notas del Proyecto
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="notes-content">
+                {{ project.notes }}
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !project" class="error-container">
+    <mat-icon>error</mat-icon>
+    <h2>Proyecto no encontrado</h2>
+    <p>El proyecto que buscas no existe o no tienes permisos para verlo.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver a Proyectos
+    </button>
+  </div>
+</div>

@@ -1,0 +1,154 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>
+      <mat-icon>person</mat-icon>
+      Detalle de Cliente
+    </h1>
+    <div class="header-actions">
+      <button mat-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+      <button mat-raised-button color="primary" (click)="editClient()" *ngIf="client">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando cliente...</p>
+  </div>
+
+  <div *ngIf="client && !loading" class="client-details">
+    <!-- Información principal -->
+    <mat-card class="main-info">
+      <mat-card-header>
+        <div mat-card-avatar class="client-avatar">
+          <mat-icon>{{ client.contactType === 'company' ? 'business' : 'person' }}</mat-icon>
+        </div>
+        <mat-card-title>{{ client.name }}</mat-card-title>
+        <mat-card-subtitle>{{ client.contactType === 'company' ? 'Empresa' : 'Individual' }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="status-chip">
+          <mat-chip-set>
+            <mat-chip [class]="client.isActive ? 'active-chip' : 'inactive-chip'">
+              <mat-icon matChipAvatar>{{ client.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ client.isActive ? 'Activo' : 'Inactivo' }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Información de contacto -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>contact_mail</mat-icon>
+          Información de Contacto
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon>email</mat-icon>
+            <div>
+              <label>Email</label>
+              <p>{{ client.email }}</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <mat-icon>phone</mat-icon>
+            <div>
+              <label>Teléfono</label>
+              <p>{{ client.phone }}</p>
+            </div>
+          </div>
+          <div class="info-item" *ngIf="client.company">
+            <mat-icon>business</mat-icon>
+            <div>
+              <label>Empresa</label>
+              <p>{{ client.company }}</p>
+            </div>
+          </div>
+          <div class="info-item" *ngIf="client.taxId">
+            <mat-icon>receipt</mat-icon>
+            <div>
+              <label>RUC/Tax ID</label>
+              <p>{{ client.taxId }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Dirección -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>location_on</mat-icon>
+          Dirección
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="address-info">
+          <p class="address-line">{{ client.address }}</p>
+          <p class="address-line">{{ client.city }}, {{ client.state }} {{ client.zipCode }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Notas adicionales -->
+    <mat-card *ngIf="client.notes">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>note</mat-icon>
+          Notas
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="notes-text">{{ client.notes }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Información del sistema -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Información del Sistema
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon>schedule</mat-icon>
+            <div>
+              <label>Fecha de Creación</label>
+              <p>{{ formatDate(client.createdAt) }}</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <mat-icon>update</mat-icon>
+            <div>
+              <label>Última Actualización</label>
+              <p>{{ formatDate(client.updatedAt) }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="!client && !loading" class="error-container">
+    <mat-icon>error</mat-icon>
+    <h2>Cliente no encontrado</h2>
+    <p>El cliente que buscas no existe o ha sido eliminado.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Volver a la lista
+    </button>
+  </div>
+</div>

@@ -1,0 +1,241 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <mat-icon>account_balance</mat-icon>
+      Reportes Financieros
+    </h1>
+    <div class="header-actions">
+      <button mat-raised-button [matMenuTriggerFor]="exportMenu" [disabled]="loading || !report">
+        <mat-icon>download</mat-icon>
+        Exportar
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportReport('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Exportar PDF
+        </button>
+        <button mat-menu-item (click)="exportReport('excel')">
+          <mat-icon>table_chart</mat-icon>
+          Exportar Excel
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>filter_list</mat-icon>
+        Filtros
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filtersForm" class="filters-form">
+        <div class="filters-row">
+          <mat-form-field>
+            <mat-label>Fecha Inicio</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Fecha Fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Cliente</mat-label>
+            <mat-select formControlName="clientId">
+              <mat-option value="">Todos los clientes</mat-option>
+              <mat-option *ngFor="let client of clients" [value]="client.id">
+                {{ client.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="">Todos los estados</mat-option>
+              <mat-option value="pending">Pendiente</mat-option>
+              <mat-option value="accepted">Aceptado</mat-option>
+              <mat-option value="rejected">Rechazado</mat-option>
+              <mat-option value="expired">Expirado</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filters-actions">
+          <button mat-raised-button color="primary" (click)="applyFilters()" [disabled]="loading">
+            <mat-icon>search</mat-icon>
+            Aplicar Filtros
+          </button>
+          <button mat-button (click)="clearFilters()" [disabled]="loading">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Generando reporte financiero...</p>
+  </div>
+
+  <!-- Report Content -->
+  <div *ngIf="!loading && report" class="report-content">
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <mat-card class="summary-card revenue">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ formatCurrency(report.totalRevenue) }}</h3>
+              <p>Ingresos Totales</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card expenses">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>trending_down</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ formatCurrency(report.totalExpenses) }}</h3>
+              <p>Gastos Totales</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card profit" [class.negative]="report.profit < 0">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>{{ report.profit >= 0 ? 'attach_money' : 'money_off' }}</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ formatCurrency(report.profit) }}</h3>
+              <p>Ganancia</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card margin">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>percent</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ report.profitMargin.toFixed(1) }}%</h3>
+              <p>Margen de Ganancia</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quotes Statistics -->
+    <mat-card class="quotes-stats">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>description</mat-icon>
+          Estadísticas de Cotizaciones
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="quotes-grid">
+          <div class="quote-stat">
+            <h4>{{ report.quotesCount }}</h4>
+            <p>Total Cotizaciones</p>
+          </div>
+          <div class="quote-stat accepted">
+            <h4>{{ report.acceptedQuotes }}</h4>
+            <p>Aceptadas</p>
+          </div>
+          <div class="quote-stat rejected">
+            <h4>{{ report.rejectedQuotes }}</h4>
+            <p>Rechazadas</p>
+          </div>
+          <div class="quote-stat pending">
+            <h4>{{ report.pendingQuotes }}</h4>
+            <p>Pendientes</p>
+          </div>
+          <div class="quote-stat average">
+            <h4>{{ formatCurrency(report.averageQuoteValue) }}</h4>
+            <p>Valor Promedio</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Monthly Revenue Chart -->
+    <mat-card class="chart-card" *ngIf="report.monthlyRevenue.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>show_chart</mat-icon>
+          Ingresos Mensuales
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <div class="chart-placeholder">
+            <mat-icon>bar_chart</mat-icon>
+            <p>Gráfico de ingresos mensuales</p>
+            <small>{{ report.monthlyRevenue.length }} meses de datos</small>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Expenses by Category -->
+    <mat-card class="chart-card" *ngIf="report.expensesByCategory.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>pie_chart</mat-icon>
+          Gastos por Categoría
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="expenses-list">
+          <div *ngFor="let expense of report.expensesByCategory" class="expense-item">
+            <div class="expense-info">
+              <span class="expense-category">{{ expense.category }}</span>
+              <span class="expense-amount">{{ formatCurrency(expense.amount) }}</span>
+            </div>
+            <div class="expense-bar">
+              <div class="expense-fill" [style.width.%]="getExpensePercentage(expense.amount)"></div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- No Data -->
+  <mat-card *ngIf="!loading && !report" class="no-data-card">
+    <mat-card-content>
+      <div class="no-data">
+        <mat-icon>analytics</mat-icon>
+        <h3>No hay datos disponibles</h3>
+        <p>Ajusta los filtros para generar el reporte financiero</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

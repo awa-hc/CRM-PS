@@ -1,0 +1,303 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <mat-icon>assignment</mat-icon>
+      Reportes de Proyectos
+    </h1>
+    <div class="header-actions">
+      <button mat-raised-button [matMenuTriggerFor]="exportMenu" [disabled]="loading || !report">
+        <mat-icon>download</mat-icon>
+        Exportar
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportReport('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Exportar PDF
+        </button>
+        <button mat-menu-item (click)="exportReport('excel')">
+          <mat-icon>table_chart</mat-icon>
+          Exportar Excel
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>filter_list</mat-icon>
+        Filtros
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filtersForm" class="filters-form">
+        <div class="filters-row">
+          <mat-form-field>
+            <mat-label>Fecha Inicio</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Fecha Fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Cliente</mat-label>
+            <mat-select formControlName="clientId">
+              <mat-option value="">Todos los clientes</mat-option>
+              <mat-option *ngFor="let client of clients" [value]="client.id">
+                {{ client.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="">Todos los estados</mat-option>
+              <mat-option value="planning">Planificación</mat-option>
+              <mat-option value="in_progress">En Progreso</mat-option>
+              <mat-option value="on_hold">En Pausa</mat-option>
+              <mat-option value="completed">Completado</mat-option>
+              <mat-option value="cancelled">Cancelado</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filters-actions">
+          <button mat-raised-button color="primary" (click)="applyFilters()" [disabled]="loading">
+            <mat-icon>search</mat-icon>
+            Aplicar Filtros
+          </button>
+          <button mat-button (click)="clearFilters()" [disabled]="loading">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Generando reporte de proyectos...</p>
+  </div>
+
+  <!-- Report Content -->
+  <div *ngIf="!loading && report" class="report-content">
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <mat-card class="summary-card total">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>folder</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ report.totalProjects }}</h3>
+              <p>Total Proyectos</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card active">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>play_circle</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ report.activeProjects }}</h3>
+              <p>Proyectos Activos</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card completed">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ report.completedProjects }}</h3>
+              <p>Proyectos Completados</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card completion">
+        <mat-card-content>
+          <div class="summary-content">
+            <div class="summary-icon">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="summary-info">
+              <h3>{{ report.averageCompletionRate.toFixed(1) }}%</h3>
+              <p>Tasa de Finalización</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Projects by Status -->
+    <mat-card class="status-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>donut_large</mat-icon>
+          Proyectos por Estado
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="status-grid">
+          <div *ngFor="let status of report.projectsByStatus" class="status-item">
+            <div class="status-info">
+              <mat-chip [class]="getStatusClass(status.status)">{{ getStatusLabel(status.status) }}</mat-chip>
+              <span class="status-count">{{ status.count }} proyectos</span>
+            </div>
+            <div class="status-bar">
+              <mat-progress-bar 
+                mode="determinate" 
+                [value]="getStatusPercentage(status.count)"
+                [color]="getStatusColor(status.status)">
+              </mat-progress-bar>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Budget Analysis -->
+    <mat-card class="budget-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>account_balance_wallet</mat-icon>
+          Análisis de Presupuesto
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="budget-grid">
+          <div class="budget-stat">
+            <h4>{{ formatCurrency(report.totalBudget) }}</h4>
+            <p>Presupuesto Total</p>
+          </div>
+          <div class="budget-stat">
+            <h4>{{ formatCurrency(report.totalSpent) }}</h4>
+            <p>Total Gastado</p>
+          </div>
+          <div class="budget-stat">
+            <h4>{{ formatCurrency(report.totalBudget - report.totalSpent) }}</h4>
+            <p>Presupuesto Restante</p>
+          </div>
+          <div class="budget-stat">
+            <h4>{{ getBudgetUtilization().toFixed(1) }}%</h4>
+            <p>Utilización del Presupuesto</p>
+          </div>
+        </div>
+        <div class="budget-progress">
+          <mat-progress-bar 
+            mode="determinate" 
+            [value]="getBudgetUtilization()"
+            [color]="getBudgetColor()">
+          </mat-progress-bar>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Timeline Analysis -->
+    <mat-card class="timeline-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>schedule</mat-icon>
+          Análisis de Cronograma
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="timeline-grid">
+          <div class="timeline-stat on-time">
+            <h4>{{ report.activeProjects }}</h4>
+            <p>Proyectos Activos</p>
+          </div>
+          <div class="timeline-stat delayed">
+            <h4>{{ report.delayedProjects.length }}</h4>
+            <p>Proyectos Retrasados</p>
+          </div>
+          <div class="timeline-stat average">
+            <h4>{{ report.averageProjectDuration }} días</h4>
+            <p>Duración Promedio</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Top Clients -->
+    <mat-card class="clients-card" *ngIf="report.topClients.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>people</mat-icon>
+          Principales Clientes
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="clients-list">
+          <div *ngFor="let client of report.topClients" class="client-item">
+            <div class="client-info">
+              <span class="client-name">{{ client.clientName }}</span>
+              <span class="client-projects">{{ client.projectsCount }} proyectos</span>
+            </div>
+            <div class="client-value">
+              <span class="client-amount">{{ formatCurrency(client.totalValue) }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Projects -->
+    <mat-card class="recent-card" *ngIf="report.recentProjects.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Proyectos Recientes
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="recent-list">
+          <div *ngFor="let project of report.recentProjects" class="recent-item">
+            <div class="recent-info">
+              <h4>{{ project.projectName }}</h4>
+              <p>{{ project.clientName }}</p>
+              <small>{{ formatDate(project.startDate) }}</small>
+            </div>
+            <div class="recent-status">
+              <mat-chip [class]="getStatusClass(project.status)">{{ getStatusLabel(project.status) }}</mat-chip>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- No Data -->
+  <mat-card *ngIf="!loading && !report" class="no-data-card">
+    <mat-card-content>
+      <div class="no-data">
+        <mat-icon>assignment</mat-icon>
+        <h3>No hay datos disponibles</h3>
+        <p>Ajusta los filtros para generar el reporte de proyectos</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

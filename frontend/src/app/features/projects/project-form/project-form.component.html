@@ -1,0 +1,230 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+        {{ isEditMode ? 'Editar Proyecto' : 'Nuevo Proyecto' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="project-form">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h3>Información Básica</h3>
+          
+          <!-- Code field (read-only in edit mode) -->
+          <div class="form-row" *ngIf="isEditMode">
+            <mat-form-field appearance="outline">
+              <mat-label>Código del Proyecto</mat-label>
+              <input matInput formControlName="code" readonly>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre del Proyecto *</mat-label>
+              <input matInput formControlName="name" placeholder="Ej: Construcción Edificio Central">
+              <mat-error *ngIf="projectForm.get('name')?.hasError('required')">
+                El nombre es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Cliente *</mat-label>
+              <mat-select formControlName="client_id">
+                <mat-option *ngFor="let client of clients" [value]="client.id">
+                  {{client.name}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="projectForm.get('client_id')?.hasError('required')">
+                El cliente es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description" rows="3" placeholder="Descripción detallada del proyecto"></textarea>
+          </mat-form-field>
+        </div>
+
+        <!-- Project Details -->
+        <div class="form-section">
+          <h3>Detalles del Proyecto</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Estado *</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="planning">Planificación</mat-option>
+                <mat-option value="active">Activo</mat-option>
+                <mat-option value="completed">Completado</mat-option>
+                <mat-option value="cancelled">Cancelado</mat-option>
+                <mat-option value="on_hold">En Espera</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Prioridad *</mat-label>
+              <mat-select formControlName="priority">
+                <mat-option value="low">Baja</mat-option>
+                <mat-option value="medium">Media</mat-option>
+                <mat-option value="high">Alta</mat-option>
+                <mat-option value="urgent">Urgente</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo *</mat-label>
+              <mat-select formControlName="type">
+                <mat-option value="construction">Construcción</mat-option>
+                <mat-option value="renovation">Renovación</mat-option>
+                <mat-option value="maintenance">Mantenimiento</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="form-section">
+          <h3>Ubicación</h3>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Dirección *</mat-label>
+            <input matInput formControlName="address" placeholder="Dirección completa del proyecto">
+            <mat-error *ngIf="projectForm.get('address')?.hasError('required')">
+              La dirección es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Ciudad *</mat-label>
+              <input matInput formControlName="city">
+              <mat-error *ngIf="projectForm.get('city')?.hasError('required')">
+                La ciudad es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Estado/Provincia *</mat-label>
+              <input matInput formControlName="state">
+              <mat-error *ngIf="projectForm.get('state')?.hasError('required')">
+                El estado es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Código Postal *</mat-label>
+              <input matInput formControlName="zipCode">
+              <mat-error *ngIf="projectForm.get('zipCode')?.hasError('required')">
+                El código postal es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="form-section">
+          <h3>Fechas</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de Inicio</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de Fin</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+
+
+          </div>
+        </div>
+
+        <!-- Budget -->
+        <div class="form-section">
+          <h3>Presupuesto</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Presupuesto *</mat-label>
+              <input matInput type="number" formControlName="budget" placeholder="0.00">
+              <span matPrefix>$&nbsp;</span>
+              <mat-error *ngIf="projectForm.get('budget')?.hasError('required')">
+                El presupuesto es requerido
+              </mat-error>
+              <mat-error *ngIf="projectForm.get('budget')?.hasError('min')">
+                El presupuesto debe ser mayor a 0
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Costo Estimado *</mat-label>
+              <input matInput type="number" formControlName="estimatedCost" placeholder="0.00">
+              <span matPrefix>$&nbsp;</span>
+              <mat-error *ngIf="projectForm.get('estimatedCost')?.hasError('required')">
+                El costo estimado es requerido
+              </mat-error>
+              <mat-error *ngIf="projectForm.get('estimatedCost')?.hasError('min')">
+                El costo estimado debe ser mayor a 0
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" *ngIf="isEditMode">
+              <mat-label>Costo Real</mat-label>
+              <input matInput type="number" formControlName="actualCost" placeholder="0.00">
+              <span matPrefix>$&nbsp;</span>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Progress (only in edit mode) -->
+        <div class="form-section" *ngIf="isEditMode">
+          <h3>Progreso</h3>
+          
+          <div class="progress-section">
+            <mat-form-field appearance="outline">
+              <mat-label>Progreso (%)</mat-label>
+              <input matInput type="number" formControlName="progress" min="0" max="100">
+              <mat-error *ngIf="projectForm.get('progress')?.hasError('min')">
+                El progreso no puede ser menor a 0
+              </mat-error>
+              <mat-error *ngIf="projectForm.get('progress')?.hasError('max')">
+                El progreso no puede ser mayor a 100
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-section">
+          <h3>Notas</h3>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notas adicionales</mat-label>
+            <textarea matInput formControlName="notes" rows="4" placeholder="Notas, comentarios o información adicional"></textarea>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button type="button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Cancelar
+      </button>
+      <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="projectForm.invalid || loading">
+        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+        <mat-icon *ngIf="!loading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+        {{ loading ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear') }} Proyecto
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

@@ -1,0 +1,183 @@
+.page-container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.client-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.main-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.main-info mat-card-header {
+  color: white;
+}
+
+.client-avatar {
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.client-avatar mat-icon {
+  color: white;
+  font-size: 24px;
+}
+
+.status-chip {
+  margin-top: 16px;
+}
+
+.active-chip {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.inactive-chip {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.info-item mat-icon {
+  color: #666;
+  margin-top: 4px;
+}
+
+.info-item label {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0;
+  display: block;
+}
+
+.info-item p {
+  margin: 4px 0 0 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.address-info {
+  padding: 8px 0;
+}
+
+.address-line {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.notes-text {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  gap: 16px;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  text-align: center;
+  gap: 16px;
+}
+
+.error-container mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #f44336;
+}
+
+.error-container h2 {
+  margin: 0;
+  color: #333;
+}
+
+.error-container p {
+  margin: 0;
+  color: #666;
+  max-width: 400px;
+}
+
+mat-card {
+  margin-bottom: 0;
+}
+
+mat-card-header {
+  margin-bottom: 16px;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

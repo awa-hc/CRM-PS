@@ -1,0 +1,230 @@
+<div class="quote-form-container">
+  <!-- Header -->
+  <div class="header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{isEditMode ? 'Editar Cotización' : 'Nueva Cotización'}}</h1>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Form -->
+  <form *ngIf="!loading" [formGroup]="quoteForm" (ngSubmit)="onSubmit()">
+    <!-- Basic Information -->
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>Información Básica</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Cliente *</mat-label>
+            <mat-select formControlName="clientId" (selectionChange)="onClientChange($event.value)">
+              <mat-option *ngFor="let client of clients" [value]="client.id">
+                {{client.name}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="quoteForm.get('clientId')?.hasError('required')">
+              El cliente es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Proyecto</mat-label>
+            <mat-select formControlName="projectId">
+              <mat-option value="">Sin proyecto</mat-option>
+              <mat-option *ngFor="let project of filteredProjects" [value]="project.id">
+                {{project.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Título *</mat-label>
+            <input matInput formControlName="title" placeholder="Título de la cotización">
+            <mat-error *ngIf="quoteForm.get('title')?.hasError('required')">
+              El título es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description" rows="3" 
+                     placeholder="Descripción de la cotización"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Válida hasta</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="validUntil">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tasa de impuesto (%)</mat-label>
+            <input matInput type="number" formControlName="taxRate" 
+                   placeholder="0" min="0" max="100" step="0.01">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Descuento</mat-label>
+            <input matInput type="number" formControlName="discount" 
+                   placeholder="0.00" min="0" step="0.01">
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Items -->
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>Items de la Cotización</mat-card-title>
+        <button type="button" mat-raised-button color="primary" (click)="addItem()">
+          <mat-icon>add</mat-icon>
+          Agregar Item
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="items-container" formArrayName="items">
+          <div *ngFor="let item of items.controls; let i = index" 
+               [formGroupName]="i" class="item-row">
+            <div class="item-header">
+              <span class="item-number">Item {{i + 1}}</span>
+              <button type="button" mat-icon-button color="warn" 
+                      (click)="removeItem(i)" [disabled]="items.length === 1">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+
+            <div class="item-fields">
+              <mat-form-field appearance="outline" class="description-field">
+                <mat-label>Descripción *</mat-label>
+                <input matInput formControlName="description" 
+                       placeholder="Descripción del item">
+                <mat-error *ngIf="item.get('description')?.hasError('required')">
+                  La descripción es requerida
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Cantidad *</mat-label>
+                <input matInput type="number" formControlName="quantity" 
+                       placeholder="1" min="0.01" step="0.01" 
+                       (input)="calculateItemTotal(i)">
+                <mat-error *ngIf="item.get('quantity')?.hasError('required')">
+                  La cantidad es requerida
+                </mat-error>
+                <mat-error *ngIf="item.get('quantity')?.hasError('min')">
+                  La cantidad debe ser mayor a 0
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Unidad</mat-label>
+                <mat-select formControlName="unit">
+                  <mat-option value="pcs">Piezas</mat-option>
+                  <mat-option value="m2">m²</mat-option>
+                  <mat-option value="m3">m³</mat-option>
+                  <mat-option value="kg">kg</mat-option>
+                  <mat-option value="hrs">Horas</mat-option>
+                  <mat-option value="days">Días</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Precio unitario *</mat-label>
+                <input matInput type="number" formControlName="unitPrice" 
+                       placeholder="0.00" min="0" step="0.01" 
+                       (input)="calculateItemTotal(i)">
+                <mat-error *ngIf="item.get('unitPrice')?.hasError('required')">
+                  El precio unitario es requerido
+                </mat-error>
+                <mat-error *ngIf="item.get('unitPrice')?.hasError('min')">
+                  El precio debe ser mayor o igual a 0
+                </mat-error>
+              </mat-form-field>
+
+              <div class="item-total">
+                <strong>Total: {{getItemTotal(i) | currency:'USD':'symbol':'1.2-2'}}</strong>
+              </div>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Notas</mat-label>
+              <textarea matInput formControlName="notes" rows="2" 
+                       placeholder="Notas adicionales del item"></textarea>
+            </mat-form-field>
+
+            <mat-divider *ngIf="i < items.length - 1"></mat-divider>
+          </div>
+        </div>
+
+        <!-- Quote Totals -->
+        <div class="quote-totals">
+          <div class="totals-row">
+            <span>Subtotal:</span>
+            <span>{{getSubtotal() | currency:'USD':'symbol':'1.2-2'}}</span>
+          </div>
+          <div class="totals-row" *ngIf="quoteForm.get('discount')?.value > 0">
+            <span>Descuento:</span>
+            <span>-{{quoteForm.get('discount')?.value | currency:'USD':'symbol':'1.2-2'}}</span>
+          </div>
+          <div class="totals-row" *ngIf="quoteForm.get('taxRate')?.value > 0">
+            <span>Impuestos ({{quoteForm.get('taxRate')?.value}}%):</span>
+            <span>{{getTaxAmount() | currency:'USD':'symbol':'1.2-2'}}</span>
+          </div>
+          <div class="totals-row total-row">
+            <span><strong>Total:</strong></span>
+            <span><strong>{{getTotal() | currency:'USD':'symbol':'1.2-2'}}</strong></span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Additional Information -->
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>Información Adicional</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notas</mat-label>
+            <textarea matInput formControlName="notes" rows="3" 
+                     placeholder="Notas adicionales de la cotización"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Términos y condiciones</mat-label>
+            <textarea matInput formControlName="terms" rows="4" 
+                     placeholder="Términos y condiciones de la cotización"></textarea>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" mat-stroked-button (click)="goBack()">
+        Cancelar
+      </button>
+      <button type="submit" mat-raised-button color="primary" 
+              [disabled]="quoteForm.invalid || saving">
+        <mat-icon *ngIf="saving">hourglass_empty</mat-icon>
+        {{saving ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear')}} Cotización
+      </button>
+    </div>
+  </form>
+</div>

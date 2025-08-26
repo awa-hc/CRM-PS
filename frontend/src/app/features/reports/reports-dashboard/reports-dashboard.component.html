@@ -1,0 +1,214 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <mat-icon>dashboard</mat-icon>
+      Panel de Reportes
+    </h1>
+    <p class="page-description">
+      Resumen general de la actividad y métricas clave del sistema
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando estadísticas...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && stats">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon clients">
+              <mat-icon>people</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.totalClients }}</h3>
+              <p>Total Clientes</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon projects">
+              <mat-icon>construction</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.totalProjects }}</h3>
+              <p>Total Proyectos</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon quotes">
+              <mat-icon>description</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.totalQuotes }}</h3>
+              <p>Total Cotizaciones</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon revenue">
+              <mat-icon>euro_symbol</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ formatCurrency(stats.monthlyRevenue) }}</h3>
+              <p>Ingresos del Mes</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Report Navigation -->
+    <div class="reports-grid">
+      <mat-card class="report-card" routerLink="/reports/financial">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>account_balance</mat-icon>
+            Reportes Financieros
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Análisis detallado de ingresos, gastos y rentabilidad</p>
+          <ul>
+            <li>Ingresos por período</li>
+            <li>Análisis de gastos</li>
+            <li>Márgenes de ganancia</li>
+            <li>Estadísticas de cotizaciones</li>
+          </ul>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary">
+            <mat-icon>arrow_forward</mat-icon>
+            Ver Reportes
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="report-card" routerLink="/reports/projects">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>construction</mat-icon>
+            Reportes de Proyectos
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Seguimiento y análisis del rendimiento de proyectos</p>
+          <ul>
+            <li>Estado de proyectos</li>
+            <li>Análisis de presupuestos</li>
+            <li>Tiempos de ejecución</li>
+            <li>Clientes principales</li>
+          </ul>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary">
+            <mat-icon>arrow_forward</mat-icon>
+            Ver Reportes
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="report-card" routerLink="/reports/clients">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>people</mat-icon>
+            Reportes de Clientes
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Análisis de la base de clientes y su actividad</p>
+          <ul>
+            <li>Clientes más activos</li>
+            <li>Distribución geográfica</li>
+            <li>Historial de proyectos</li>
+            <li>Valor por cliente</li>
+          </ul>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary">
+            <mat-icon>arrow_forward</mat-icon>
+            Ver Reportes
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <!-- Activity Section -->
+    <div class="activity-section">
+      <!-- Recent Activity -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>history</mat-icon>
+            Actividad Reciente
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list *ngIf="stats.recentActivity.length > 0; else noActivity">
+            <mat-list-item *ngFor="let activity of stats.recentActivity">
+              <mat-icon matListItemIcon>{{ getActivityIcon(activity.type) }}</mat-icon>
+              <div matListItemTitle>{{ activity.title }}</div>
+              <div matListItemLine>
+                {{ getActivityTypeLabel(activity.type) }} • {{ formatDate(activity.date) }}
+              </div>
+              <mat-chip *ngIf="activity.status" [color]="getStatusColor(activity.status)">
+                {{ activity.status }}
+              </mat-chip>
+            </mat-list-item>
+          </mat-list>
+          <ng-template #noActivity>
+            <p class="no-data">No hay actividad reciente</p>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Upcoming Deadlines -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>schedule</mat-icon>
+            Próximos Vencimientos
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list *ngIf="stats.upcomingDeadlines.length > 0; else noDeadlines">
+            <mat-list-item *ngFor="let deadline of stats.upcomingDeadlines">
+              <mat-icon matListItemIcon [class]="getDeadlineClass(deadline.daysLeft)">
+                {{ deadline.type === 'project' ? 'construction' : 'description' }}
+              </mat-icon>
+              <div matListItemTitle>{{ deadline.title }}</div>
+              <div matListItemLine>
+                Vence: {{ formatDate(deadline.deadline) }}
+              </div>
+              <mat-chip [class]="getDeadlineChipClass(deadline.daysLeft)">
+                {{ deadline.daysLeft }} días
+              </mat-chip>
+            </mat-list-item>
+          </mat-list>
+          <ng-template #noDeadlines>
+            <p class="no-data">No hay vencimientos próximos</p>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

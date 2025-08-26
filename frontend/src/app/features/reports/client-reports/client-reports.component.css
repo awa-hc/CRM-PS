@@ -1,0 +1,430 @@
+.page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.filters-card {
+  margin-bottom: 24px;
+}
+
+.filters-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 16px;
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.summary-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card.total {
+  border-left: 4px solid #2196f3;
+}
+
+.summary-card.active {
+  border-left: 4px solid #4caf50;
+}
+
+.summary-card.revenue {
+  border-left: 4px solid #ff9800;
+}
+
+.summary-card.average {
+  border-left: 4px solid #9c27b0;
+}
+
+.summary-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.summary-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.summary-icon mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.summary-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.summary-info p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+
+.performance-card, .types-card, .top-clients-card, .activity-card, .geographic-card {
+  margin-bottom: 24px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.performance-table {
+  width: 100%;
+}
+
+.completion-rate {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.completion-rate span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.types-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.type-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.type-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.type-count {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+
+.type-bar {
+  min-width: 150px;
+}
+
+.type-revenue {
+  font-weight: 600;
+  color: #2196f3;
+  min-width: 100px;
+  text-align: right;
+}
+
+.top-clients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.top-client-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.client-rank {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #2196f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+}
+
+.client-details {
+  flex: 1;
+}
+
+.client-details h4 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.client-details p {
+  margin: 0 0 4px 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+
+.client-details small {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 0.8rem;
+}
+
+.client-metrics {
+  display: flex;
+  gap: 24px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.activity-icon.new-client {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.activity-icon.new-project {
+  background: rgba(33, 150, 243, 0.1);
+  color: #2196f3;
+}
+
+.activity-icon.quote-sent {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.activity-info {
+  flex: 1;
+}
+
+.activity-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.activity-info p {
+  margin: 0 0 4px 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+
+.activity-info small {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 0.8rem;
+}
+
+.activity-value {
+  font-weight: 600;
+  color: #2196f3;
+}
+
+.geographic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.location-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.location-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.location-name {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.location-count {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+
+.location-bar {
+  min-width: 150px;
+}
+
+.location-revenue {
+  font-weight: 600;
+  color: #ff9800;
+  min-width: 100px;
+  text-align: right;
+}
+
+.mat-chip.individual {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.mat-chip.company {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.no-data-card {
+  margin-top: 24px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 48px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.no-data mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+}
+
+.no-data h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+}
+
+.no-data p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .filters-row {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .type-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .client-metrics {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .location-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

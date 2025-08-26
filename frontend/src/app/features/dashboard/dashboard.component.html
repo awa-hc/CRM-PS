@@ -1,0 +1,110 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Dashboard</h1>
+      <p class="user-greeting" *ngIf="currentUser()">
+        Bienvenido, {{ currentUser()?.first_name }} {{ currentUser()?.last_name }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando dashboard...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!isLoading()" class="dashboard-content">
+    <!-- Dashboard Cards -->
+    <div class="dashboard-grid">
+      <mat-card 
+        *ngFor="let card of dashboardCards()" 
+        class="dashboard-card" 
+        [class]="'card-' + card.color"
+        (click)="navigateToRoute(card.route)"
+        role="button"
+        tabindex="0">
+        <mat-card-content>
+          <div class="card-header">
+            <mat-icon [class]="'icon-' + card.color">{{ card.icon }}</mat-icon>
+            <span class="card-value">{{ card.value }}</span>
+          </div>
+          <h3 class="card-title">{{ card.title }}</h3>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Dashboard Sections -->
+    <div class="dashboard-sections">
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h2>Acciones Rápidas</h2>
+        <mat-card>
+          <mat-card-content>
+            <div class="actions-grid">
+              <button 
+                mat-raised-button 
+                color="primary" 
+                (click)="navigateToRoute('/clients/new')">
+                <mat-icon>person_add</mat-icon>
+                Nuevo Cliente
+              </button>
+              <button 
+                mat-raised-button 
+                color="accent" 
+                (click)="navigateToRoute('/app/projects/new')">
+                <mat-icon>add_circle</mat-icon>
+                Nuevo Proyecto
+              </button>
+              <button 
+                mat-raised-button 
+                color="warn" 
+                (click)="navigateToRoute('/quotes/new')">
+                <mat-icon>description</mat-icon>
+                Nueva Cotización
+              </button>
+              <button 
+                mat-raised-button 
+                (click)="navigateToRoute('/reports')">
+                <mat-icon>assessment</mat-icon>
+                Ver Reportes
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-activity">
+        <h2>Actividad Reciente</h2>
+        <mat-card>
+          <mat-list *ngIf="recentActivity().length > 0; else noActivity">
+            <mat-list-item *ngFor="let activity of recentActivity()">
+              <mat-icon 
+                matListItemIcon 
+                [class]="getActivityIconClass(activity.type)">
+                {{ getActivityIcon(activity.type) }}
+              </mat-icon>
+              <div matListItemTitle>{{ activity.description }}</div>
+              <div matListItemLine>
+                <mat-chip [class]="getActivityChipClass(activity.type)">
+                  {{ getActivityTypeLabel(activity.type) }}
+                </mat-chip>
+                <span class="activity-date">{{ formatDate(activity.date) }}</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+          
+          <ng-template #noActivity>
+            <div class="no-activity">
+              <mat-icon>inbox</mat-icon>
+              <p>No hay actividad reciente</p>
+            </div>
+          </ng-template>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

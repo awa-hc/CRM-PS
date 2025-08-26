@@ -1,0 +1,277 @@
+.page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.filters-card {
+  margin-bottom: 24px;
+}
+
+.filters-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 16px;
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.summary-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card.revenue {
+  border-left: 4px solid #4caf50;
+}
+
+.summary-card.expenses {
+  border-left: 4px solid #f44336;
+}
+
+.summary-card.profit {
+  border-left: 4px solid #2196f3;
+}
+
+.summary-card.profit.negative {
+  border-left: 4px solid #f44336;
+}
+
+.summary-card.margin {
+  border-left: 4px solid #ff9800;
+}
+
+.summary-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.summary-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.summary-icon mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.summary-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.summary-info p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+
+.quotes-stats {
+  margin-bottom: 24px;
+}
+
+.quotes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 24px;
+  text-align: center;
+}
+
+.quote-stat h4 {
+  margin: 0 0 8px 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.quote-stat p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+}
+
+.quote-stat.accepted h4 {
+  color: #4caf50;
+}
+
+.quote-stat.rejected h4 {
+  color: #f44336;
+}
+
+.quote-stat.pending h4 {
+  color: #ff9800;
+}
+
+.quote-stat.average h4 {
+  color: #2196f3;
+}
+
+.chart-card {
+  margin-bottom: 24px;
+}
+
+.chart-container {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-placeholder {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.chart-placeholder mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.expenses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.expense-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.expense-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expense-category {
+  font-weight: 500;
+}
+
+.expense-amount {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.expense-bar {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.expense-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2196f3, #21cbf3);
+  transition: width 0.3s ease;
+}
+
+.no-data-card {
+  margin-top: 24px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 48px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.no-data mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+}
+
+.no-data h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+}
+
+.no-data p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .filters-row {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quotes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,163 @@
+.quotes-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.filters-card {
+  margin-bottom: 24px;
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filters mat-form-field {
+  min-width: 200px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+.table-card {
+  overflow-x: auto;
+}
+
+.quotes-table {
+  width: 100%;
+  min-width: 800px;
+}
+
+.quote-link {
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.quote-link:hover {
+  text-decoration: underline;
+}
+
+.title-cell .title {
+  display: block;
+  font-weight: 500;
+}
+
+.title-cell .description {
+  display: block;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+.client-link, .project-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.client-link:hover, .project-link:hover {
+  text-decoration: underline;
+}
+
+.no-project {
+  color: #999;
+  font-style: italic;
+}
+
+.status-draft {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-sent {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-accepted {
+  background-color: #e8f5e8;
+  color: #388e3c;
+}
+
+.status-rejected {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.status-expired {
+  background-color: #fafafa;
+  color: #757575;
+}
+
+.total-amount {
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+.expired {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.no-expiry {
+  color: #999;
+  font-style: italic;
+}
+
+.delete-action {
+  color: #d32f2f;
+}
+
+.no-data {
+  text-align: center;
+  padding: 48px;
+  color: #666;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .quotes-container {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters mat-form-field {
+    min-width: unset;
+    width: 100%;
+  }
+}
