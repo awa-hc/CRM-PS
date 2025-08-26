@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -13,17 +12,9 @@ import (
 var DB *gorm.DB
 
 func InitDB() {
-	// Configuración de la base de datos
-	host := getEnv("DB_HOST", "localhost")
-	port := getEnv("DB_PORT", "5432")
-	user := getEnv("DB_USER", "postgres")
-	password := getEnv("DB_PASSWORD", "password")
-	dbname := getEnv("DB_NAME", "raborimet_crm")
-	sslmode := getEnv("DB_SSLMODE", "disable")
-
-	// Cadena de conexión
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		host, port, user, password, dbname, sslmode)
+	// Usar DATABASE_URL directamente o valor por defecto
+	defaultDatabaseURL := "postgres://avnadmin:AVNS_6JAvyq33eXv1P0af8pJ@pg-35eb9e99-leohermoso18-d7f0.j.aivencloud.com:12238/defaultdb?sslmode=require"
+	dsn := getEnv("DATABASE_URL", defaultDatabaseURL)
 
 	// Conectar a la base de datos
 	var err error

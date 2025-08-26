@@ -4,18 +4,15 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"raborimet-crm/backend/config"
 	"raborimet-crm/backend/routes"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// Cargar variables de entorno
-	if err := godotenv.Load(); err != nil {
-		log.Println("No se encontró archivo .env, usando variables del sistema")
-	}
+	// No cargar archivos .env - usar solo variables del sistema
 
 	// Inicializar base de datos
 	config.InitDB()
@@ -32,12 +29,15 @@ func main() {
 	router.RedirectFixedPath = false
 
 	// Configurar CORS
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:4200"} // Angular dev server
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	config.AllowCredentials = true
-	router.Use(cors.New(config))
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{
+		"http://localhost:4200",                // Angular dev server
+		"https://crm-ps.vercel.app/auth/login", // Frontend en Vercel
+	}
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	corsConfig.AllowCredentials = true
+	router.Use(cors.New(corsConfig))
 
 	// Configurar rutas
 	routes.SetupRoutes(router)
