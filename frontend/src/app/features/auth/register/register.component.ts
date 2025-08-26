@@ -85,7 +85,7 @@ export class RegisterComponent {
             duration: 3000,
             panelClass: ['success-snackbar']
           });
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/app/dashboard']);
         },
         error: (error) => {
           this.isLoading.set(false);
